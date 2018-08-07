@@ -1,0 +1,12 @@
+.catkin_workspace
+build
+devel
+.directory
+.cproject
+.project
+.tags
+doc/html/*
+*.vscode
+*.idea/
+*.pyc
+CMakeLists.txt.user
