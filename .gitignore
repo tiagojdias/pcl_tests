@@ -10,3 +10,4 @@ doc/html/*
 *.idea/
 *.pyc
 CMakeLists.txt.user
+cmake-build-debug/
