@@ -20,7 +20,6 @@ showHelp(char * program_name)
 int
 main (int argc, char** argv)
 {
-
     // Show help
     if (pcl::console::find_switch (argc, argv, "-h") || pcl::console::find_switch (argc, argv, "--help")) {
         showHelp (argv[0]);
@@ -45,18 +44,23 @@ main (int argc, char** argv)
     }
 
     // Load file | Works with PCD and PLY files
-    pcl::PointCloud<pcl::PointXYZ>::Ptr source_cloud (new pcl::PointCloud<pcl::PointXYZ> ());
+    pcl::PointCloud<pcl::PointXYZ>::Ptr source_cloud(new pcl::PointCloud<pcl::PointXYZ>());
 
-    if (file_is_pcd) {
-        if (pcl::io::loadPCDFile (argv[filenames[0]], *source_cloud) < 0)  {
+    if (file_is_pcd)
+    {
+        if (pcl::io::loadPCDFile(argv[filenames[0]], *source_cloud) < 0)
+        {
             std::cout << "Error loading point cloud " << argv[filenames[0]] << std::endl << std::endl;
-            showHelp (argv[0]);
+            showHelp(argv[0]);
             return -1;
         }
-    } else {
-        if (pcl::io::loadPLYFile (argv[filenames[0]], *source_cloud) < 0)  {
+    }
+    else
+    {
+        if (pcl::io::loadPLYFile(argv[filenames[0]], *source_cloud) < 0)
+        {
             std::cout << "Error loading point cloud " << argv[filenames[0]] << std::endl << std::endl;
-            showHelp (argv[0]);
+            showHelp(argv[0]);
             return -1;
         }
     }
@@ -73,6 +77,7 @@ main (int argc, char** argv)
       This is the "manual" method, perfect to understand but error prone !
     */
     Eigen::Matrix4f transform_1 = Eigen::Matrix4f::Identity();
+
 
     // Define a rotation matrix (see https://en.wikipedia.org/wiki/Rotation_matrix)
     float theta = M_PI/4; // The angle of rotation in radians
