@@ -7,8 +7,8 @@ int main (int argc, char** argv)
     pcl::PointCloud<pcl::PointXYZ> cloud;
 
     // Fill in the cloud data
-    cloud.width    = 5;
-    cloud.height   = 5;
+    cloud.width    = 3;
+    cloud.height   = 3;
     cloud.is_dense = false;
     cloud.points.resize(cloud.width * cloud.height);
 

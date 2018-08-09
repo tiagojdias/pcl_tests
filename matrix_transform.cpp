@@ -7,6 +7,8 @@
 #include <pcl/common/transforms.h>
 #include <pcl/visualization/pcl_visualizer.h>
 
+#include <ctime>
+
 // This function displays the help
 void showHelp(char * program_name)
 {
@@ -78,8 +80,12 @@ int main (int argc, char** argv)
     */
     Eigen::Matrix4f transform_1 = Eigen::Matrix4f::Identity();
 
+    std::cout << transform_1 << std::endl << std::endl;
+
+    std::cout << transform_1(1,0) << std::endl;
+
     // Define a rotation matrix (see https://en.wikipedia.org/wiki/Rotation_matrix)
-    float theta = M_PI/4; // The angle of rotation in radians
+    float theta = M_PI/9; // The angle of rotation in radians
     transform_1(0,0) = cos(theta);
     transform_1(0,1) = -sin(theta);
     transform_1(1,0) = sin(theta);
@@ -132,10 +138,33 @@ int main (int argc, char** argv)
     viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, "transformed_cloud");
     //viewer.setPosition(800, 400); // Setting visualiser window position
 
+    int a = 0;
     while (!viewer.wasStopped())
     { // Display the visualiser until 'q' key is pressed
+//        static std::time_t result_prev = std::time(nullptr);
+//        std::time_t result = std::time(nullptr);
+//        std::asctime(std::localtime(&result));
+
+//        if (result != result_prev)
+        a++;
+        if (a % 100000 == 0)
+        {
+            std::cout << "Adding another point ..." << std::endl; // DEBUG DELETE
+            pcl::PointXYZ p;
+            p.x = 1024 * rand() / (RAND_MAX + 100.0f);
+            p.y = 1024 * rand() / (RAND_MAX + 100.0f);
+            p.z = 1024 * rand() / (RAND_MAX + 100.0f);
+            transformed_cloud->points.push_back(p);
+
+            viewer.updatePointCloud(transformed_cloud, transformed_cloud_color_handler, "transformed_cloud");
+        }
+//        result_prev = result;
+
+
         viewer.spinOnce();
     }
+
+
 
     return 0;
 }
