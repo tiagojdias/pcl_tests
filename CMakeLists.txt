@@ -30,17 +30,17 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
 # pcd_write_test
-add_executable(pcd_write_test pcd_write.cpp)
+add_executable(pcd_write_test basic/pcd_write.cpp)
 target_link_libraries(pcd_write_test ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES})
 
 # matrix_transform
-add_executable (matrix_transform matrix_transform.cpp)
+add_executable (matrix_transform basic/matrix_transform.cpp)
 target_link_libraries (matrix_transform ${PCL_LIBRARIES})
 
 # bilateral_filter_main
-add_executable (bilateral_filter_main bilateral_filter_main.cpp)
+add_executable (bilateral_filter_main basic/bilateral_filter_main.cpp)
 target_link_libraries (bilateral_filter_main ${PCL_LIBRARIES})
 
 # estimating_surface_normals
-add_executable (estimating_surface_normals estimating_surface_normals.cpp)
+add_executable (estimating_surface_normals features/estimating_surface_normals.cpp)
 target_link_libraries (estimating_surface_normals ${PCL_LIBRARIES})
