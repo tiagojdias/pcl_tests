@@ -1,3 +1,5 @@
+#include <elapse_timer.hpp>
+
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/features/normal_3d.h>
@@ -38,13 +40,11 @@ int main (int, char** argv)
 
     pcl::PointCloud<pcl::Normal>::Ptr cloud_normals(new pcl::PointCloud<pcl::Normal>); // Output datasets
 
-    auto start = std::chrono::high_resolution_clock::now();
     std::cout << "Starting to compute normals with search radius " << search_radius << " meters ..." << std::endl; // DEBUG DELETE
     ne.setRadiusSearch(search_radius); // Use all neighbors in a sphere of radius 3cm
+    prodrone::ElapseTimer execution_time;
     ne.compute(*cloud_normals); // Compute the features
-    auto finish = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed = finish - start;
-    std::cout << "Computation finished. Elapsed time: " << elapsed.count() << " sec." << std::endl; // DEBUG DELETE
+    std::cout << "Computation finished. Elapsed time: " << execution_time.elapsed() << " sec." << std::endl; // DEBUG DELETE
 
     // visualize normals
     pcl::visualization::PCLVisualizer viewer("PCL Viewer");

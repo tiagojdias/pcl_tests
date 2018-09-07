@@ -24,10 +24,13 @@ set(STRICT_GCC_FLAGS "\
 
 
 find_package(PCL 1.7 REQUIRED)
-
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
+
+include_directories(helpers)
+
+### Basic
 
 # pcd_write_test
 add_executable(pcd_write_test basic/pcd_write.cpp)
@@ -41,6 +44,13 @@ target_link_libraries (matrix_transform ${PCL_LIBRARIES})
 add_executable (bilateral_filter_main basic/bilateral_filter_main.cpp)
 target_link_libraries (bilateral_filter_main ${PCL_LIBRARIES})
 
+
+### Features
+
 # estimating_surface_normals
 add_executable (estimating_surface_normals features/estimating_surface_normals.cpp)
 target_link_libraries (estimating_surface_normals ${PCL_LIBRARIES})
+
+# estimating_surface_normals
+add_executable (normal_estimation_using_integral_images features/normal_estimation_using_integral_images.cpp)
+target_link_libraries (normal_estimation_using_integral_images ${PCL_LIBRARIES})
