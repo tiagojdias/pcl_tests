@@ -40,3 +40,7 @@ target_link_libraries (matrix_transform ${PCL_LIBRARIES})
 # bilateral_filter_main
 add_executable (bilateral_filter_main bilateral_filter_main.cpp)
 target_link_libraries (bilateral_filter_main ${PCL_LIBRARIES})
+
+# estimating_surface_normals
+add_executable (estimating_surface_normals estimating_surface_normals.cpp)
+target_link_libraries (estimating_surface_normals ${PCL_LIBRARIES})
