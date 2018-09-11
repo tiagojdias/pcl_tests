@@ -78,17 +78,6 @@ int main(int argc, char** argv)
     pcl::removeNaNFromPointCloud(*cloud_in, *cloud, indices);
     std::cout << "After removing NaN points, " << cloud->points.size() << " points left." << std::endl;
 
-
-//    for (int i = 0; i < cloud->points.size(); i++)
-//    {
-//        if (!pcl::isFinite<pcl::PointXYZ>(cloud->points[i]))
-//        {
-//            PCL_WARN("point[%d] is not finite (%d, %d, %d), removing it\n", i, cloud->points[i].x, cloud->points[i].y, cloud->points[i].z);
-//            cloud->points.erase(cloud->begin() + i);
-//        }
-//    }
-//
-
     // Compute the normals
     pcl::NormalEstimationOMP<pcl::PointXYZ, pcl::Normal> normal_estimation;
     normal_estimation.setInputCloud(cloud);
@@ -109,12 +98,12 @@ int main(int argc, char** argv)
         if (!pcl::isFinite<pcl::Normal>(cloud_with_normals->points[i]))
         {
             PCL_WARN("normals[%d] is not finite, removing it\n", i);
-//            cloud_with_normals->points.erase(cloud_with_normals->begin() + i);
+            cloud_with_normals->points.erase(cloud_with_normals->begin() + i);
         }
     }
 
-//    prodrone::NormalsVisualizer nv;
-//    nv.visualize(cloud, cloud_with_normals);
+    prodrone::NormalsVisualizer nv;
+    nv.visualize(cloud, cloud_with_normals);
 
     // Setup the feature computation
     pcl::FPFHEstimationOMP<pcl::PointXYZ, pcl::Normal, pcl::FPFHSignature33> fpfh_estimation;
