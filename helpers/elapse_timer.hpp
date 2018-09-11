@@ -2,6 +2,7 @@
 #define TIMER_HPP
 
 #include <chrono>
+#include <iostream>
 
 namespace prodrone
 {
@@ -20,6 +21,11 @@ public:
         auto finish = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = finish - start;
         return elapsed.count();
+    }
+
+    void printElapsed()
+    {
+        std::cout << "Time to execute: " << this->elapsed() << " seconds." << std::endl;
     }
 };
 

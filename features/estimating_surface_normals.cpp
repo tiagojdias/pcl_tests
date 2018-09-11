@@ -54,7 +54,7 @@ int main (int, char** argv)
     pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> cloud_color_handler(cloud, 230, 20, 20); // Red
     viewer.addPointCloud(cloud, cloud_color_handler, "transformed_cloud");
 
-    while (!viewer.wasStopped ())
+    while (!viewer.wasStopped())
     {
         viewer.spinOnce ();
     }
