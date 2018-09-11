@@ -48,9 +48,11 @@ target_link_libraries (bilateral_filter_main ${PCL_LIBRARIES})
 ### Features
 
 # estimating_surface_normals
-add_executable (estimating_surface_normals features/estimating_surface_normals.cpp)
+add_executable(estimating_surface_normals features/estimating_surface_normals.cpp)
 target_link_libraries (estimating_surface_normals ${PCL_LIBRARIES})
-
-# estimating_surface_normals
-add_executable (normal_estimation_using_integral_images features/normal_estimation_using_integral_images.cpp)
+# normal_estimation_using_integral_images
+add_executable(normal_estimation_using_integral_images features/normal_estimation_using_integral_images.cpp)
 target_link_libraries (normal_estimation_using_integral_images ${PCL_LIBRARIES})
+# point_feature_histograms
+add_executable(point_feature_histograms features/point_feature_histograms.cpp)
+target_link_libraries (point_feature_histograms ${PCL_LIBRARIES})
