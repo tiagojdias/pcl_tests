@@ -10,6 +10,8 @@
 #include <pcl/features/range_image_border_extractor.h>
 #include <pcl/console/parse.h>
 
+#include <elapse_timer.hpp>
+
 typedef pcl::PointXYZ PointType;
 
 // --------------------
@@ -133,7 +135,9 @@ int main(int argc, char** argv)
     // -------------------------
     pcl::RangeImageBorderExtractor border_extractor(&range_image);
     pcl::PointCloud<pcl::BorderDescription> border_descriptions;
+    prodrone::ElapseTimer et;
     border_extractor.compute(border_descriptions);
+    et.printElapsed();
 
     // ----------------------------------
     // -----Show points in 3D viewer-----

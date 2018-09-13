@@ -55,9 +55,18 @@ target_link_libraries (point_feature_histograms ${PCL_LIBRARIES})
 # fast_point_feature_histograms
 add_executable(fast_point_feature_histograms features/fast_point_feature_histograms.cpp)
 target_link_libraries (fast_point_feature_histograms ${PCL_LIBRARIES})
+# narf_keypoint_extraction
+add_executable(narf_keypoint_extraction features/narf_keypoint_extraction.cpp)
+target_link_libraries (narf_keypoint_extraction ${PCL_LIBRARIES})
 # narf_feature_extraction
 add_executable(narf_feature_extraction features/narf_feature_extraction.cpp)
 target_link_libraries (narf_feature_extraction ${PCL_LIBRARIES})
+# rops_feature
+add_executable(rops_feature features/rops_feature.cpp)
+target_link_libraries (rops_feature ${PCL_LIBRARIES})
+
+
+
 
 ### Range images
 # range_image_creation
