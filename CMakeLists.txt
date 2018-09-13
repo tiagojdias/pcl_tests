@@ -56,6 +56,9 @@ target_link_libraries (normal_estimation_using_integral_images ${PCL_LIBRARIES})
 # point_feature_histograms
 add_executable(point_feature_histograms features/point_feature_histograms.cpp)
 target_link_libraries (point_feature_histograms ${PCL_LIBRARIES})
-# fast_point_feature_histograms.cpp
+# fast_point_feature_histograms
 add_executable(fast_point_feature_histograms features/fast_point_feature_histograms.cpp)
 target_link_libraries (fast_point_feature_histograms ${PCL_LIBRARIES})
+# narf_feature_extraction
+add_executable(narf_feature_extraction features/narf_feature_extraction.cpp)
+target_link_libraries (narf_feature_extraction ${PCL_LIBRARIES})
