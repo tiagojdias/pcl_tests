@@ -31,22 +31,18 @@ add_definitions(${PCL_DEFINITIONS})
 include_directories(helpers)
 
 ### Basic
-
 # pcd_write_test
 add_executable(pcd_write_test basic/pcd_write.cpp)
 target_link_libraries(pcd_write_test ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES})
-
 # matrix_transform
 add_executable (matrix_transform basic/matrix_transform.cpp)
 target_link_libraries (matrix_transform ${PCL_LIBRARIES})
-
 # bilateral_filter_main
 add_executable (bilateral_filter_main basic/bilateral_filter_main.cpp)
 target_link_libraries (bilateral_filter_main ${PCL_LIBRARIES})
 
 
 ### Features
-
 # estimating_surface_normals
 add_executable(estimating_surface_normals features/estimating_surface_normals.cpp)
 target_link_libraries (estimating_surface_normals ${PCL_LIBRARIES})
@@ -62,3 +58,11 @@ target_link_libraries (fast_point_feature_histograms ${PCL_LIBRARIES})
 # narf_feature_extraction
 add_executable(narf_feature_extraction features/narf_feature_extraction.cpp)
 target_link_libraries (narf_feature_extraction ${PCL_LIBRARIES})
+
+### Range images
+# range_image_creation
+add_executable(range_image_creation range_images/range_image_creation.cpp)
+target_link_libraries (range_image_creation ${PCL_LIBRARIES})
+# range_image_border_extraction
+add_executable(range_image_border_extraction range_images/range_image_border_extraction.cpp)
+target_link_libraries (range_image_border_extraction ${PCL_LIBRARIES})

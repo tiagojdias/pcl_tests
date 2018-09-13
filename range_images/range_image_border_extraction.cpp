@@ -8,7 +8,6 @@
 #include <pcl/visualization/range_image_visualizer.h>
 #include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/features/range_image_border_extractor.h>
-#include <pcl/keypoints/narf_keypoint.h>
 #include <pcl/console/parse.h>
 
 typedef pcl::PointXYZ PointType;
@@ -17,7 +16,6 @@ typedef pcl::PointXYZ PointType;
 // -----Parameters-----
 // --------------------
 float angular_resolution = 0.5f;
-float support_size = 0.2f;
 pcl::RangeImage::CoordinateFrame coordinate_frame = pcl::RangeImage::CAMERA_FRAME;
 bool setUnseenToMaxRange = false;
 
@@ -31,23 +29,10 @@ void printUsage(const char* progName)
         << "-------------------------------------------\n"
         << "-r <float>   angular resolution in degrees(default "<<angular_resolution<<")\n"
         << "-c <int>     coordinate frame(default "<<(int)coordinate_frame<<")\n"
-        << "-m           Treat all unseen points as maximum range readings\n"
-        << "-s <float>   support size for the interest points(diameter of the used sphere - "
-        <<                                                     "default "<<support_size<<")\n"
+        << "-m           Treat all unseen points to max range\n"
         << "-h           this help\n"
         << "\n\n";
 }
-
-//void 
-//setViewerPose(pcl::visualization::PCLVisualizer& viewer, const Eigen::Affine3f& viewer_pose)
-//{
-//Eigen::Vector3f pos_vector = viewer_pose * Eigen::Vector3f(0, 0, 0);
-//Eigen::Vector3f look_at_vector = viewer_pose.rotation() * Eigen::Vector3f(0, 0, 1) + pos_vector;
-//Eigen::Vector3f up_vector = viewer_pose.rotation() * Eigen::Vector3f(0, -1, 0);
-//viewer.setCameraPosition(pos_vector[0], pos_vector[1], pos_vector[2],
-//look_at_vector[0], look_at_vector[1], look_at_vector[2],
-//up_vector[0], up_vector[1], up_vector[2]);
-//}
 
 // --------------
 // -----Main-----
@@ -73,8 +58,6 @@ int main(int argc, char** argv)
         coordinate_frame = pcl::RangeImage::CoordinateFrame(tmp_coordinate_frame);
         cout << "Using coordinate frame "<<(int)coordinate_frame<<".\n";
     }
-    if (pcl::console::parse(argc, argv, "-s", support_size) >= 0)
-        cout << "Setting support size to "<<support_size<<".\n";
     if (pcl::console::parse(argc, argv, "-r", angular_resolution) >= 0)
         cout << "Setting angular resolution to "<<angular_resolution<<"deg.\n";
     angular_resolution = pcl::deg2rad(angular_resolution);
@@ -92,13 +75,14 @@ int main(int argc, char** argv)
         std::string filename = argv[pcd_filename_indices[0]];
         if (pcl::io::loadPCDFile(filename, point_cloud) == -1)
         {
-            cerr << "Was not able to open file \""<<filename<<"\".\n";
+            cout << "Was not able to open file \""<<filename<<"\".\n";
             printUsage(argv[0]);
             return 0;
         }
         scene_sensor_pose = Eigen::Affine3f(Eigen::Translation3f(point_cloud.sensor_origin_[0],
-                                                                 point_cloud.sensor_origin_[1],
-                                                                 point_cloud.sensor_origin_[2])) * Eigen::Affine3f(point_cloud.sensor_orientation_);
+                                                                   point_cloud.sensor_origin_[1],
+                                                                   point_cloud.sensor_origin_[2])) *
+            Eigen::Affine3f(point_cloud.sensor_orientation_);
 
         std::string far_ranges_filename = pcl::getFilenameWithoutExtension(filename)+"_far_ranges.pcd";
         if (pcl::io::loadPCDFile(far_ranges_filename.c_str(), far_ranges) == -1)
@@ -106,7 +90,6 @@ int main(int argc, char** argv)
     }
     else
     {
-        setUnseenToMaxRange = true;
         cout << "\nNo *.pcd file given => Genarating example point cloud.\n\n";
         for (float x=-0.5f; x<=0.5f; x+=0.01f)
         {
@@ -138,61 +121,69 @@ int main(int argc, char** argv)
     // --------------------------------------------
     pcl::visualization::PCLVisualizer viewer("3D Viewer");
     viewer.setBackgroundColor(1, 1, 1);
-    pcl::visualization::PointCloudColorHandlerCustom<pcl::PointWithRange> range_image_color_handler(range_image_ptr, 0, 0, 0);
-    viewer.addPointCloud(range_image_ptr, range_image_color_handler, "range image");
-    viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "range image");
-    //viewer.addCoordinateSystem(1.0f, "global");
-    //PointCloudColorHandlerCustom<PointType> point_cloud_color_handler(point_cloud_ptr, 150, 150, 150);
-    //viewer.addPointCloud(point_cloud_ptr, point_cloud_color_handler, "original point cloud");
-    viewer.initCameraParameters();
-    //setViewerPose(viewer, range_image.getTransformationToWorldSystem());
+    viewer.addCoordinateSystem(1.0f, "global");
+    pcl::visualization::PointCloudColorHandlerCustom<PointType> point_cloud_color_handler(point_cloud_ptr, 0, 0, 0);
+    viewer.addPointCloud(point_cloud_ptr, point_cloud_color_handler, "original point cloud");
+    //PointCloudColorHandlerCustom<pcl::PointWithRange> range_image_color_handler(range_image_ptr, 150, 150, 150);
+    //viewer.addPointCloud(range_image_ptr, range_image_color_handler, "range image");
+    //viewer.setPointCloudRenderingProperties(PCL_VISUALIZER_POINT_SIZE, 2, "range image");
 
-    // --------------------------
-    // -----Show range image-----
-    // --------------------------
-    pcl::visualization::RangeImageVisualizer range_image_widget("Range image");
-    range_image_widget.showRangeImage(range_image);
+    // -------------------------
+    // -----Extract borders-----
+    // -------------------------
+    pcl::RangeImageBorderExtractor border_extractor(&range_image);
+    pcl::PointCloud<pcl::BorderDescription> border_descriptions;
+    border_extractor.compute(border_descriptions);
 
-    // --------------------------------
-    // -----Extract NARF keypoints-----
-    // --------------------------------
-    pcl::RangeImageBorderExtractor range_image_border_extractor;
-    pcl::NarfKeypoint narf_keypoint_detector(&range_image_border_extractor);
-    narf_keypoint_detector.setRangeImage(&range_image);
-    narf_keypoint_detector.getParameters().support_size = support_size;
-    //narf_keypoint_detector.getParameters().add_points_on_straight_edges = true;
-    //narf_keypoint_detector.getParameters().distance_for_additional_points = 0.5;
+    // ----------------------------------
+    // -----Show points in 3D viewer-----
+    // ----------------------------------
+    pcl::PointCloud<pcl::PointWithRange>::Ptr border_points_ptr(new pcl::PointCloud<pcl::PointWithRange>),
+        veil_points_ptr(new pcl::PointCloud<pcl::PointWithRange>),
+        shadow_points_ptr(new pcl::PointCloud<pcl::PointWithRange>);
+    pcl::PointCloud<pcl::PointWithRange>& border_points = *border_points_ptr,
+        & veil_points = * veil_points_ptr,
+        & shadow_points = *shadow_points_ptr;
+    for (int y=0; y<(int)range_image.height; ++y)
+    {
+        for (int x=0; x<(int)range_image.width; ++x)
+        {
+            if (border_descriptions.points[y*range_image.width + x].traits[pcl::BORDER_TRAIT__OBSTACLE_BORDER])
+                border_points.points.push_back(range_image.points[y*range_image.width + x]);
+            if (border_descriptions.points[y*range_image.width + x].traits[pcl::BORDER_TRAIT__VEIL_POINT])
+                veil_points.points.push_back(range_image.points[y*range_image.width + x]);
+            if (border_descriptions.points[y*range_image.width + x].traits[pcl::BORDER_TRAIT__SHADOW_BORDER])
+                shadow_points.points.push_back(range_image.points[y*range_image.width + x]);
+        }
+    }
+    pcl::visualization::PointCloudColorHandlerCustom<pcl::PointWithRange> border_points_color_handler(border_points_ptr, 0, 255, 0);
+    viewer.addPointCloud<pcl::PointWithRange>(border_points_ptr, border_points_color_handler, "border points");
+    viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 7, "border points");
+    pcl::visualization::PointCloudColorHandlerCustom<pcl::PointWithRange> veil_points_color_handler(veil_points_ptr, 255, 0, 0);
+    viewer.addPointCloud<pcl::PointWithRange>(veil_points_ptr, veil_points_color_handler, "veil points");
+    viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 7, "veil points");
+    pcl::visualization::PointCloudColorHandlerCustom<pcl::PointWithRange> shadow_points_color_handler(shadow_points_ptr, 0, 255, 255);
+    viewer.addPointCloud<pcl::PointWithRange>(shadow_points_ptr, shadow_points_color_handler, "shadow points");
+    viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 7, "shadow points");
 
-    pcl::PointCloud<int> keypoint_indices;
-    narf_keypoint_detector.compute(keypoint_indices);
-    std::cout << "Found "<<keypoint_indices.points.size()<<" key points.\n";
-
-    // ----------------------------------------------
-    // -----Show keypoints in range image widget-----
-    // ----------------------------------------------
-    //for (size_t i=0; i<keypoint_indices.points.size(); ++i)
-    //range_image_widget.markPoint(keypoint_indices.points[i]%range_image.width,
-    //keypoint_indices.points[i]/range_image.width);
-
+    //-------------------------------------
+    // -----Show points on range image-----
+    // ------------------------------------
+    pcl::visualization::RangeImageVisualizer* range_image_borders_widget = NULL;
+    range_image_borders_widget = pcl::visualization::RangeImageVisualizer::getRangeImageBordersWidget(range_image,
+                                                                                                      -std::numeric_limits<float>::infinity(),
+                                                                                                      std::numeric_limits<float>::infinity(),
+                                                                                                      false, border_descriptions,
+                                                                                                      "Range image with borders");
     // -------------------------------------
-    // -----Show keypoints in 3D viewer-----
-    // -------------------------------------
-    pcl::PointCloud<pcl::PointXYZ>::Ptr keypoints_ptr(new pcl::PointCloud<pcl::PointXYZ>);
-    pcl::PointCloud<pcl::PointXYZ>& keypoints = *keypoints_ptr;
-    keypoints.points.resize(keypoint_indices.points.size());
-    for (size_t i=0; i < keypoint_indices.points.size(); ++i)
-        keypoints.points[i].getVector3fMap() = range_image.points[keypoint_indices.points[i]].getVector3fMap();
 
-    pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> keypoints_color_handler(keypoints_ptr, 0, 255, 0);
-    viewer.addPointCloud<pcl::PointXYZ>(keypoints_ptr, keypoints_color_handler, "keypoints");
-    viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 7, "keypoints");
 
     //--------------------
     // -----Main loop-----
     //--------------------
-    while (!viewer.wasStopped())
+    while(!viewer.wasStopped())
     {
-        range_image_widget.spinOnce();  // process GUI events
+        range_image_borders_widget->spinOnce();
         viewer.spinOnce();
         pcl_sleep(0.01);
     }
