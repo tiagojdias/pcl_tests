@@ -17,7 +17,7 @@ int main (int argc, char** argv)
     reader.read(filename, *cloud); // Remember to download the file first!
 
     std::cerr << "PointCloud before filtering: " << cloud->width * cloud->height
-        << " data points (" << pcl::getFieldsList (*cloud) << ").";
+        << " data points (" << pcl::getFieldsList (*cloud) << "). \n";
 
     // Create the filtering object
     pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
