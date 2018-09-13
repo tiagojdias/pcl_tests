@@ -66,8 +66,6 @@ add_executable(rops_feature features/rops_feature.cpp)
 target_link_libraries (rops_feature ${PCL_LIBRARIES})
 
 
-
-
 ### Range images
 # range_image_creation
 add_executable(range_image_creation range_images/range_image_creation.cpp)
@@ -75,3 +73,13 @@ target_link_libraries (range_image_creation ${PCL_LIBRARIES})
 # range_image_border_extraction
 add_executable(range_image_border_extraction range_images/range_image_border_extraction.cpp)
 target_link_libraries (range_image_border_extraction ${PCL_LIBRARIES})
+
+
+### Filters
+# passthrough
+add_executable(passthrough filters/passthrough.cpp)
+target_link_libraries (passthrough ${PCL_LIBRARIES})
+# voxel_grid
+add_executable(voxel_grid filters/voxel_grid.cpp)
+target_link_libraries (voxel_grid ${PCL_LIBRARIES})
+
