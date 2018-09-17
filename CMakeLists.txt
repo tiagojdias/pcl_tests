@@ -82,4 +82,8 @@ target_link_libraries (passthrough ${PCL_LIBRARIES})
 # voxel_grid
 add_executable(voxel_grid filters/voxel_grid.cpp)
 target_link_libraries (voxel_grid ${PCL_LIBRARIES})
+# voxel_grid
+add_executable(statistical_removal filters/statistical_removal.cpp)
+target_link_libraries (statistical_removal ${PCL_LIBRARIES})
+
 
