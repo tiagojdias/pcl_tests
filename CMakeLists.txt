@@ -82,8 +82,11 @@ target_link_libraries (passthrough ${PCL_LIBRARIES})
 # voxel_grid
 add_executable(voxel_grid filters/voxel_grid.cpp)
 target_link_libraries (voxel_grid ${PCL_LIBRARIES})
-# voxel_grid
+# statistical_removal
 add_executable(statistical_removal filters/statistical_removal.cpp)
 target_link_libraries (statistical_removal ${PCL_LIBRARIES})
+# extract_indices
+add_executable(extract_indices filters/extract_indices.cpp)
+target_link_libraries (extract_indices ${PCL_LIBRARIES})
 
 
