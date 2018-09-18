@@ -94,4 +94,8 @@ target_link_libraries (extract_indices ${PCL_LIBRARIES})
 #kdtree_search
 add_executable(kdtree_search trees/kdtree_search.cpp)
 target_link_libraries (kdtree_search ${PCL_LIBRARIES})
+#point_cloud_compression
+add_executable(point_cloud_compression trees/point_cloud_compression.cpp)
+target_link_libraries (point_cloud_compression ${PCL_LIBRARIES})
+
 
