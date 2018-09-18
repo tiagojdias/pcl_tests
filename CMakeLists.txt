@@ -90,3 +90,8 @@ add_executable(extract_indices filters/extract_indices.cpp)
 target_link_libraries (extract_indices ${PCL_LIBRARIES})
 
 
+### Trees
+#kdtree_search
+add_executable(kdtree_search trees/kdtree_search.cpp)
+target_link_libraries (kdtree_search ${PCL_LIBRARIES})
+
