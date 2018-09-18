@@ -104,3 +104,8 @@ target_link_libraries (octree_search ${PCL_LIBRARIES})
 add_executable(octree_change_detection trees/octree_change_detection.cpp)
 target_link_libraries (octree_change_detection ${PCL_LIBRARIES})
 
+
+### Recognition
+# correspondence_grouping
+add_executable(correspondence_grouping recognition/correspondence_grouping.cpp)
+target_link_libraries (correspondence_grouping ${PCL_LIBRARIES})
