@@ -14,6 +14,7 @@
 #include <pcl/console/parse.h>
 
 #include <elapse_timer.hpp>
+#include <pcl/filters/voxel_grid.h>
 
 typedef pcl::PointXYZRGBA PointType;
 typedef pcl::Normal NormalType;
@@ -155,9 +156,7 @@ double computeCloudResolution(const pcl::PointCloud<PointType>::ConstPtr &cloud)
 
 int main(int argc, char *argv[])
 {
-    prodrone::ElapseTimer e0("Parse command");
     parseCommandLine(argc, argv);
-    e0.printElapsed();
 
     pcl::PointCloud<PointType>::Ptr model(new pcl::PointCloud<PointType>());
     pcl::PointCloud<PointType>::Ptr model_keypoints(new pcl::PointCloud<PointType>());
@@ -168,6 +167,7 @@ int main(int argc, char *argv[])
     pcl::PointCloud<DescriptorType>::Ptr model_descriptors(new pcl::PointCloud<DescriptorType>());
     pcl::PointCloud<DescriptorType>::Ptr scene_descriptors(new pcl::PointCloud<DescriptorType>());
 
+    prodrone::ElapseTimer e0("Load clouds");
     //
     //  Load clouds
     //
@@ -183,6 +183,14 @@ int main(int argc, char *argv[])
         showHelp(argv[0]);
         return(-1);
     }
+    e0.printElapsed();
+
+    TRY TO REDUCE
+    // Create the filtering object
+//    pcl::VoxelGrid<pcl::PointCloud> sor;
+//    sor.setInputCloud(scene);
+//    sor.setLeafSize (0.01f, 0.01f, 0.01f);
+//    sor.filter (*scene);
 
     //
     //  Set up resolution invariance
@@ -207,6 +215,8 @@ int main(int argc, char *argv[])
         std::cout << "Clustering bin size:    " << cg_size_ << std::endl << std::endl;
     }
 
+
+    prodrone::ElapseTimer e1("Cloud normals");
     //
     //  Compute Normals
     //
@@ -217,7 +227,9 @@ int main(int argc, char *argv[])
 
     norm_est.setInputCloud(scene);
     norm_est.compute(*scene_normals);
+    e1.printElapsed();
 
+    prodrone::ElapseTimer e2("Keypoints extraction");
     //
     //  Downsample Clouds to Extract keypoints
     //
@@ -235,8 +247,10 @@ int main(int argc, char *argv[])
     uniform_sampling.compute(sampled_indices);
     pcl::copyPointCloud(*scene, sampled_indices.points, *scene_keypoints);
     std::cout << "Scene total points: " << scene->size() << "; Selected Keypoints: " << scene_keypoints->size() << std::endl;
+    e2.printElapsed();
 
 
+    prodrone::ElapseTimer e3("Descriptor for keypoints");
     //
     //  Compute Descriptor for keypoints
     //
@@ -252,7 +266,9 @@ int main(int argc, char *argv[])
     descr_est.setInputNormals(scene_normals);
     descr_est.setSearchSurface(scene);
     descr_est.compute(*scene_descriptors);
+    e3.printElapsed();
 
+    prodrone::ElapseTimer e4("Correspondences with KdTree");
     //
     //  Find Model-Scene Correspondences with KdTree
     //
@@ -278,6 +294,7 @@ int main(int argc, char *argv[])
         }
     }
     std::cout << "Correspondences found: " << model_scene_corrs->size() << std::endl;
+    e4.printElapsed();
 
     //
     //  Actual Clustering
@@ -288,6 +305,7 @@ int main(int argc, char *argv[])
     //  Using Hough3D
     if (use_hough_)
     {
+        prodrone::ElapseTimer e5("Hough3D");
         //
         //  Compute(Keypoints) Reference Frames only for Hough
         //
@@ -323,6 +341,7 @@ int main(int argc, char *argv[])
 
         //clusterer.cluster(clustered_corrs);
         clusterer.recognize(rototranslations, clustered_corrs);
+        e5.printElapsed();
     }
     else // Using GeometricConsistency
     {
