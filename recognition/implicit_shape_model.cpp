@@ -11,6 +11,12 @@
 
 #include <elapse_timer.hpp>
 
+
+/**
+ * execute from ~/Git/pcl_tests/models/recognition by command:
+ * ./../../build/implicit_shape_model ism_train_cat.pcd 0 ism_train_horse.pcd 1 ism_train_lioness.pcd 2 ism_train_michael.pcd 3 ism_train_wolf.pcd 4 ism_test_cat.pcd 0
+ */
+
 int main(int argc, char** argv)
 {
     if (argc == 0 || argc % 2 == 0)
@@ -44,12 +50,12 @@ int main(int argc, char** argv)
         training_normals.push_back(tr_normals);
         training_classes.push_back(tr_class);
     }
-
+//
     pcl::FPFHEstimation<pcl::PointXYZ, pcl::Normal, pcl::Histogram<153> >::Ptr fpfh
        (new pcl::FPFHEstimation<pcl::PointXYZ, pcl::Normal, pcl::Histogram<153> >);
     fpfh->setRadiusSearch(30.0);
     pcl::Feature< pcl::PointXYZ, pcl::Histogram<153> >::Ptr feature_estimator(fpfh);
-
+//
     pcl::ism::ImplicitShapeModelEstimation<153, pcl::PointXYZ, pcl::Normal> ism;
     ism.setFeatureEstimator(feature_estimator);
     ism.setTrainingClouds(training_clouds);
@@ -57,15 +63,12 @@ int main(int argc, char** argv)
     ism.setTrainingClasses(training_classes);
     ism.setSamplingSize(2.0f);
 
-    prodrone::ElapseTimer e1("Train model", true);
     pcl::ism::ImplicitShapeModelEstimation<153, pcl::PointXYZ, pcl::Normal>::ISMModelPtr model = boost::shared_ptr<pcl::features::ISMModel>
        (new pcl::features::ISMModel);
-    ism.trainISM(model);
-    e1.printElapsed();
+//    ism.trainISM(model);
 
     std::string file("trained_ism_model.txt");
-    model->saveModelToFile(file);
-
+//    model->saveModelToFile(file);
     model->loadModelFromfile(file);
 
     unsigned int testing_class = static_cast<unsigned int>(strtol(argv[argc - 1], 0, 10));
