@@ -115,3 +115,8 @@ target_link_libraries (implicit_shape_model ${PCL_LIBRARIES})
 # global_hypothesis_verification - has errors during compilation
 #add_executable(global_hypothesis_verification recognition/global_hypothesis_verification.cpp)
 #target_link_libraries (global_hypothesis_verification ${PCL_LIBRARIES})
+
+### Registration
+# iterative_closest_point
+add_executable(iterative_closest_point registration/iterative_closest_point.cpp)
+target_link_libraries (iterative_closest_point ${PCL_LIBRARIES})
