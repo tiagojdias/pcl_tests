@@ -17,7 +17,7 @@ public:
     ElapseTimer(std::string start_message = "", bool show_construction_msg = false):
     start(std::chrono::high_resolution_clock::now())
     {
-        if (show_construction_msg) std::cout << start_message << "timer started" << std::endl;
+        if (show_construction_msg) std::cout << start_message << " timer started ..." << std::endl;
         msg = start_message;
     }
 

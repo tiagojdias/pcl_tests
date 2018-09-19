@@ -109,3 +109,9 @@ target_link_libraries (octree_change_detection ${PCL_LIBRARIES})
 # correspondence_grouping
 add_executable(correspondence_grouping recognition/correspondence_grouping.cpp)
 target_link_libraries (correspondence_grouping ${PCL_LIBRARIES})
+# implicit_shape_model
+add_executable(implicit_shape_model recognition/implicit_shape_model.cpp)
+target_link_libraries (implicit_shape_model ${PCL_LIBRARIES})
+# global_hypothesis_verification - has errors during compilation
+#add_executable(global_hypothesis_verification recognition/global_hypothesis_verification.cpp)
+#target_link_libraries (global_hypothesis_verification ${PCL_LIBRARIES})
