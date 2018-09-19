@@ -185,13 +185,6 @@ int main(int argc, char *argv[])
     }
     e0.printElapsed();
 
-    TRY TO REDUCE
-    // Create the filtering object
-//    pcl::VoxelGrid<pcl::PointCloud> sor;
-//    sor.setInputCloud(scene);
-//    sor.setLeafSize (0.01f, 0.01f, 0.01f);
-//    sor.filter (*scene);
-
     //
     //  Set up resolution invariance
     //
