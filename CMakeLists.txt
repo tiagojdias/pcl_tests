@@ -120,3 +120,6 @@ target_link_libraries (implicit_shape_model ${PCL_LIBRARIES})
 # iterative_closest_point
 add_executable(iterative_closest_point registration/iterative_closest_point.cpp)
 target_link_libraries (iterative_closest_point ${PCL_LIBRARIES})
+# pairwise_incremental_registration
+add_executable(pairwise_incremental_registration registration/pairwise_incremental_registration.cpp)
+target_link_libraries (pairwise_incremental_registration ${PCL_LIBRARIES})
