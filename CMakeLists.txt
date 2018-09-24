@@ -132,3 +132,11 @@ target_link_libraries (normal_distributions_transform ${PCL_LIBRARIES})
 # alignment_prerejective
 add_executable(alignment_prerejective registration/alignment_prerejective.cpp)
 target_link_libraries (alignment_prerejective ${PCL_LIBRARIES})
+
+### Segmentation
+#planar_segmentation
+add_executable(planar_segmentation segmentation/planar_segmentation.cpp)
+target_link_libraries (planar_segmentation ${PCL_LIBRARIES})
+#cylinder_segmentation
+add_executable(cylinder_segmentation segmentation/cylinder_segmentation.cpp)
+target_link_libraries (cylinder_segmentation ${PCL_LIBRARIES})
