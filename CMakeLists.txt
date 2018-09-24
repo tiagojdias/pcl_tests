@@ -123,3 +123,12 @@ target_link_libraries (iterative_closest_point ${PCL_LIBRARIES})
 # pairwise_incremental_registration
 add_executable(pairwise_incremental_registration registration/pairwise_incremental_registration.cpp)
 target_link_libraries (pairwise_incremental_registration ${PCL_LIBRARIES})
+# interactive_icp
+add_executable(interactive_icp registration/interactive_icp.cpp)
+target_link_libraries (interactive_icp ${PCL_LIBRARIES})
+# normal_distributions_transform
+add_executable(normal_distributions_transform registration/normal_distributions_transform.cpp)
+target_link_libraries (normal_distributions_transform ${PCL_LIBRARIES})
+# alignment_prerejective
+add_executable(alignment_prerejective registration/alignment_prerejective.cpp)
+target_link_libraries (alignment_prerejective ${PCL_LIBRARIES})
