@@ -8,6 +8,8 @@
 #include <pcl/visualization/pcl_visualizer.h>
 #include <boost/thread/thread.hpp>
 
+#include <elapse_timer.hpp>
+
 int
 main (int argc, char** argv)
 {
@@ -34,7 +36,9 @@ main (int argc, char** argv)
     pcl::ApproximateVoxelGrid<pcl::PointXYZ> approximate_voxel_filter;
     approximate_voxel_filter.setLeafSize (0.2, 0.2, 0.2);
     approximate_voxel_filter.setInputCloud (input_cloud);
+    prodrone::ElapseTimer t1;
     approximate_voxel_filter.filter (*filtered_cloud);
+    t1.printElapsed();
     std::cout << "Filtered cloud contains " << filtered_cloud->size () << " data points from room_scan2.pcd" << std::endl;
 
     // Initializing Normal Distributions Transform (NDT).
@@ -49,7 +53,8 @@ main (int argc, char** argv)
     ndt.setResolution (1.0);
 
     // Setting max number of registration iterations.
-    ndt.setMaximumIterations (35);
+    ndt.setMaximumIterations (2);
+
 
     // Setting point cloud to be aligned.
     ndt.setInputSource (filtered_cloud);
@@ -63,7 +68,9 @@ main (int argc, char** argv)
 
     // Calculating required rigid transform to align the input cloud to the target cloud.
     pcl::PointCloud<pcl::PointXYZ>::Ptr output_cloud (new pcl::PointCloud<pcl::PointXYZ>);
+    prodrone::ElapseTimer t2;
     ndt.align (*output_cloud, init_guess);
+    t2.printElapsed();
 
     std::cout << "Normal Distributions Transform has converged:" << ndt.hasConverged () << " score: " << ndt.getFitnessScore () << std::endl;
 

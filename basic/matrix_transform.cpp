@@ -69,7 +69,7 @@ int main (int argc, char** argv)
 
     /* Reminder: how transformation matrices work :
 
-             |-------> This column is the translation
+              |-------> This column is the translation
       | 1 0 0 x |  \
       | 0 1 0 y |   }-> The identity 3x3 matrix (no rotation) on the left
       | 0 0 1 z |  /
