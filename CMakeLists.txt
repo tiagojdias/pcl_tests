@@ -134,8 +134,8 @@ add_executable(alignment_prerejective registration/alignment_prerejective.cpp)
 target_link_libraries (alignment_prerejective ${PCL_LIBRARIES})
 
 # test_app
-add_executable(alignment_prerejective registration/test_app.cpp)
-target_link_libraries (alignment_prerejective ${PCL_LIBRARIES})
+add_executable(test_app registration/test_app.cpp)
+target_link_libraries (test_app ${PCL_LIBRARIES})
 
 
 ### Segmentation
