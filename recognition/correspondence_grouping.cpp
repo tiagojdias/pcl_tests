@@ -231,7 +231,7 @@ int main(int argc, char *argv[])
     pcl::UniformSampling<PointType> uniform_sampling;
     uniform_sampling.setInputCloud(model);
     uniform_sampling.setRadiusSearch(model_ss_);
-    uniform_sampling.compute(sampled_indices);
+    uniform_sampling.(sampled_indices);
     pcl::copyPointCloud(*model, sampled_indices.points, *model_keypoints);
     std::cout << "Model total points: " << model->size() << "; Selected Keypoints: " << model_keypoints->size() << std::endl;
 

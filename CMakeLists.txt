@@ -33,7 +33,7 @@ include_directories(helpers)
 ### Basic
 # pcd_write_test
 add_executable(pcd_write_test basic/pcd_write.cpp)
-target_link_libraries(pcd_write_test ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES})
+target_link_libraries(pcd_write_test ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES} ${PCL_LIBRARIES})
 # matrix_transform
 add_executable (matrix_transform basic/matrix_transform.cpp)
 target_link_libraries (matrix_transform ${PCL_LIBRARIES})
@@ -107,8 +107,8 @@ target_link_libraries (octree_change_detection ${PCL_LIBRARIES})
 
 ### Recognition
 # correspondence_grouping
-add_executable(correspondence_grouping recognition/correspondence_grouping.cpp)
-target_link_libraries (correspondence_grouping ${PCL_LIBRARIES})
+#add_executable(correspondence_grouping recognition/correspondence_grouping.cpp)
+#target_link_libraries (correspondence_grouping ${PCL_LIBRARIES})
 # implicit_shape_model
 add_executable(implicit_shape_model recognition/implicit_shape_model.cpp)
 target_link_libraries (implicit_shape_model ${PCL_LIBRARIES})
