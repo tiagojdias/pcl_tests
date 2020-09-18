@@ -4,24 +4,10 @@ project(prodrone)
 
 ## C++11 Flags
 ##
-add_compile_options(-std=c++11)
-add_compile_options(-pthread)
-add_compile_options(-Werror=return-type)                   # error on missing return type
-add_compile_options(-Werror=format)                        # error on wrong printf formats
-add_compile_options(-Werror=parentheses)                   # error when using ambiguous syntax
-
-set(STRICT_GCC_FLAGS "\
-    -Wunused-but-set-parameter \
-    -Wunused-but-set-variable \
-    -Wunused-function \
-    -Wunused-variable \
-    -Wuninitialized \
-    -Wmaybe-uninitialized \
-    -Wno-endif-labels \
-    -Wmissing-field-initializers \
-    -Wunused-parameter
-")
-
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+SET(CMAKE_CXX_FLAGS -pthread)
+set(CMAKE_BUILD_TYPE "RELEASE") # This flag sets PCL and OMPL libraries to use high level optimization binaries
 
 find_package(PCL 1.7 REQUIRED)
 include_directories(${PCL_INCLUDE_DIRS})
