@@ -135,8 +135,16 @@ void icp(const PointCloud<PointT>::Ptr& src, const PointCloud<PointT>::Ptr& tgt,
 
     converged.setMaximumIterations(20);
     converged.setFailureAfterMaximumIterations(true);
+    converged.setAbsoluteMSE(1e-3);
 
     const auto max_iters_reached = [&converged] {return converged.getConvergenceState() == DefaultConvergenceCriteria<double>::ConvergenceState::CONVERGENCE_CRITERIA_FAILURE_AFTER_MAX_ITERATIONS;};
+    const auto wait_input = [&] {
+        next_iteration = false;
+        while (!vis->wasStopped() and not next_iteration)
+        {
+            vis->spinOnce();
+        }
+    };
 
     pcl::console::TicToc tt;
 
@@ -175,11 +183,7 @@ void icp(const PointCloud<PointT>::Ptr& src, const PointCloud<PointT>::Ptr& tgt,
                 // Visualize the results
                 view(output, tgt, good_correspondences);
 
-                next_iteration = false;
-                while (!vis->wasStopped() and not next_iteration)
-                {
-                    vis->spinOnce();
-                }
+                wait_input();
 
                 tt.tic();
 
@@ -216,6 +220,7 @@ void icp(const PointCloud<PointT>::Ptr& src, const PointCloud<PointT>::Ptr& tgt,
         std::cout << "Number of iterations to converge: " << iterations << std::endl;
         std::cerr.precision(15);
         std::cerr << transform << std::endl;
+        wait_input();
     }
     else
     {
