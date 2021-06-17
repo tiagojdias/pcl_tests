@@ -41,14 +41,14 @@ PCLVisualizer::Ptr vis;
 ////////////////////////////////////////////////////////////////////////////////
 void findCorrespondences(const CloudPtr& src, const CloudPtr& tgt, Correspondences& all_correspondences)
 {
-    // CorrespondenceEstimationNormalShooting<PointT, PointT, PointT> est;
+    CorrespondenceEstimationNormalShooting<PointT, PointT, PointT> est;
     // CorrespondenceEstimation<PointT, PointT> est;
-    CorrespondenceEstimationBackProjection<PointT, PointT, PointT> est;
+    // CorrespondenceEstimationBackProjection<PointT, PointT, PointT> est;
     est.setInputSource(src);
     est.setInputTarget(tgt);
 
     est.setSourceNormals(src);
-    est.setTargetNormals(tgt);
+    // est.setTargetNormals(tgt);
     est.setKSearch(10);
     est.determineCorrespondences(all_correspondences);
     // est.determineReciprocalCorrespondences (all_correspondences);
@@ -63,24 +63,25 @@ void rejectBadCorrespondences(const CorrespondencesPtr& all_correspondences, con
     rej.setInputCorrespondences(all_correspondences);
 
     rej.getCorrespondences(remaining_correspondences);
-    return;
 
-    CorrespondencesPtr remaining_correspondences_temp(new Correspondences);
-    rej.getCorrespondences(*remaining_correspondences_temp);
-    PCL_DEBUG("[rejectBadCorrespondences] Number of correspondences remaining "
-              "after rejection: %d\n",
-              remaining_correspondences_temp->size());
+    // No normals rejection because target has no normals
 
-    // Reject if the angle between the normals is really off
-    CorrespondenceRejectorSurfaceNormal rej_normals;
-    rej_normals.setThreshold(std::acos(deg2rad(45.0)));
-    rej_normals.initializeDataContainer<PointT, PointT>();
-    rej_normals.setInputCloud<PointT>(src);
-    rej_normals.setInputNormals<PointT, PointT>(src);
-    rej_normals.setInputTarget<PointT>(tgt);
-    rej_normals.setTargetNormals<PointT, PointT>(tgt);
-    rej_normals.setInputCorrespondences(remaining_correspondences_temp);
-    rej_normals.getCorrespondences(remaining_correspondences);
+    // CorrespondencesPtr remaining_correspondences_temp(new Correspondences);
+    // rej.getCorrespondences(*remaining_correspondences_temp);
+    // PCL_DEBUG("[rejectBadCorrespondences] Number of correspondences remaining "
+    //           "after rejection: %d\n",
+    //           remaining_correspondences_temp->size());
+
+    // // Reject if the angle between the normals is really off
+    // CorrespondenceRejectorSurfaceNormal rej_normals;
+    // rej_normals.setThreshold(std::acos(deg2rad(45.0)));
+    // rej_normals.initializeDataContainer<PointT, PointT>();
+    // rej_normals.setInputSource<PointT>(src);
+    // rej_normals.setInputNormals<PointT, PointT>(src);
+    // rej_normals.setInputTarget<PointT>(tgt);
+    // rej_normals.setTargetNormals<PointT, PointT>(tgt);
+    // rej_normals.setInputCorrespondences(remaining_correspondences_temp);
+    // rej_normals.getCorrespondences(remaining_correspondences);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -105,12 +106,20 @@ void view(const CloudConstPtr& src, const CloudConstPtr& tgt, const Corresponden
 
     pcl::console::TicToc tt;
     tt.tic();
-    if (!vis->updateCorrespondences<PointT>(src, tgt, *correspondences, 1))
-        vis->addCorrespondences<PointT>(src, tgt, *correspondences, 1, "correspondences");
+    if (correspondences)
+    {
+        if(!vis->updateCorrespondences<PointT>(src, tgt, *correspondences, 1))
+        {
+            vis->addCorrespondences<PointT>(src, tgt, *correspondences, 1, "correspondences");
+        }
+        vis->setShapeRenderingProperties(PCL_VISUALIZER_LINE_WIDTH, 3, "correspondences");
+        vis->setShapeRenderingProperties(PCL_VISUALIZER_COLOR, 1.0, 1.0, 1.0, "correspondences");
+    }
+    else
+    {
+        vis->removeCorrespondences("correspondences");
+    }
     tt.toc_print();
-
-    vis->setShapeRenderingProperties(PCL_VISUALIZER_LINE_WIDTH, 3, "correspondences");
-    vis->setShapeRenderingProperties(PCL_VISUALIZER_COLOR, 1.0, 1.0, 1.0, "correspondences");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -126,10 +135,14 @@ void icp(const PointCloud<PointT>::Ptr& src, const PointCloud<PointT>::Ptr& tgt,
     int iterations = 0;
     DefaultConvergenceCriteria<double> converged(iterations, transform, *good_correspondences);
 
+    converged.setMaximumIterations(20);
+    converged.setFailureAfterMaximumIterations(true);
+
+    const auto max_iters_reached = [&converged] {return converged.getConvergenceState() == DefaultConvergenceCriteria<double>::ConvergenceState::CONVERGENCE_CRITERIA_FAILURE_AFTER_MAX_ITERATIONS;};
+
     // Display the visualizer
     while (!vis->wasStopped())
     {
-
         vis->spinOnce();
 
         if (next_iteration)
@@ -145,24 +158,42 @@ void icp(const PointCloud<PointT>::Ptr& src, const PointCloud<PointT>::Ptr& tgt,
                 PCL_DEBUG("Number of correspondences remaining after rejection: %d\n", good_correspondences->size());
             }
             else
+            {
                 *good_correspondences = *all_correspondences;
+            }
 
-            // Find transformation
-            findTransformation(output, tgt, good_correspondences, transform);
+            if(good_correspondences->empty())
+            {
+                PCL_WARN("No corviewrespondences, cannot proceed\n");
+            }
+            else
+            {
+                // Visualize the results
+                view(output, tgt, good_correspondences);
 
-            // Obtain the final transformation
-            final_transform = transform * final_transform;
+                next_iteration = false;
+                while (!vis->wasStopped() and not next_iteration)
+                {
+                    vis->spinOnce();
+                }
 
-            // Transform the data
-            transformPointCloudWithNormals(*src, *output, final_transform.cast<float>());
+                // Find transformation
+                findTransformation(output, tgt, good_correspondences, transform);
+
+                // Obtain the final transformation
+                final_transform = transform * final_transform;
+
+                // Transform the data
+                transformPointCloudWithNormals(*src, *output, final_transform.cast<float>());
+
+                // Visualize the new results without correspondences
+                view(output, tgt, nullptr);
+            }
 
             // Check if convergence has been reached
             ++iterations;
 
-            // Visualize the results
-            view(output, tgt, good_correspondences);
-
-            if (converged)
+            if (converged or max_iters_reached())
             {
                 break;
             }
@@ -171,7 +202,7 @@ void icp(const PointCloud<PointT>::Ptr& src, const PointCloud<PointT>::Ptr& tgt,
         next_iteration = false;
     }
 
-    if (converged)
+    if (not max_iters_reached() and converged)
     {
         transform = final_transform;
         std::cout << "Number of iterations to converge: " << iterations << std::endl;
@@ -180,7 +211,7 @@ void icp(const PointCloud<PointT>::Ptr& src, const PointCloud<PointT>::Ptr& tgt,
     }
     else
     {
-        std::cout << "Could not converge";
+        std::cout << "Could not converge" << std::endl;
     }
 }
 
@@ -245,6 +276,35 @@ int main(int argc, char** argv)
         return (-1);
     }
 
+    Eigen::Matrix4d initial_transform(Eigen::Matrix4d::Identity());
+    initial_transform(0, 3) = 10.0;
+
+    transformPointCloudWithNormals(*src, *src, initial_transform.cast<float>());
+
+    // Source normals
+    {
+        NormalEstimation<PointT, PointT> normal_estimator;
+        auto tree(pcl::make_shared<pcl::search::KdTree<PointT>>());
+        normal_estimator.setSearchMethod(tree);
+        normal_estimator.setInputCloud(src);
+        normal_estimator.setRadiusSearch(2.f);
+        // Viewpoint is used to determine the sign of the normal vectors
+        normal_estimator.setViewPoint(0, 0, 0);
+        normal_estimator.compute(*src);
+    }
+
+    // Target normals
+    // {
+    //     NormalEstimation<PointT, PointT> normal_estimator;
+    //     auto tree(pcl::make_shared<pcl::search::KdTree<PointT>>());
+    //     normal_estimator.setSearchMethod(tree);
+    //     normal_estimator.setInputCloud(tgt);
+    //     normal_estimator.setRadiusSearch(2.f);
+    //     // Viewpoint is used to determine the sign of the normal vectors
+    //     normal_estimator.setViewPoint(0, 0, 0);
+    //     normal_estimator.compute(*tgt);
+    // }
+
     // Compute the best transformation
     Eigen::Matrix4d transform;
 
@@ -254,4 +314,3 @@ int main(int argc, char** argv)
 
     saveTransform(argv[p_tr_file_indices[0]], transform);
 }
-/* ]--- */
